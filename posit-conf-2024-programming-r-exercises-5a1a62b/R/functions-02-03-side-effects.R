@@ -1,0 +1,84 @@
+library("tidyverse")
+
+add <- function(x, y) {
+  x + y
+}
+
+## Your turn: which of these functions are pure, which have or use side effects?
+# pure x <- prod(1, 2, 3)
+
+# side effect x <- print("Hello")
+
+# pure x <- ggplot(mtcars, aes(x = wt, y = mpg)) + geom_point()
+
+# side effect x <- sort(c("apple", "Banana", "candle"))
+
+
+## Our turn:
+# look at `collate` setting in first section
+devtools::session_info(info = "platform")
+
+# this is the locale setting
+(temp <- Sys.getlocale("LC_COLLATE"))
+
+sort(c("apple", "Banana", "candle"))
+
+# change, then set back
+Sys.setlocale("LC_COLLATE", "C")
+
+sort(c("apple", "Banana", "candle"))
+
+Sys.setlocale("LC_COLLATE", temp)
+
+# set only within expression
+withr::with_locale(
+  # set new locale to "C"
+  # sort vector
+)
+
+Sys.getlocale("LC_COLLATE")
+
+# set only within scope
+c_sort <- function(...) {
+  # use withr::local_locale() to set only within function block
+}
+
+c_sort(c("apple", "Banana", "candle"))
+
+Sys.getlocale("LC_COLLATE")
+
+## What about dplyr?
+tibble(text = c("apple", "Banana", "candle")) |>
+  arrange(text)
+
+## Your turn: modify testthat options
+library("testthat")
+
+getOption("warnPartialMatchDollar")
+
+test_that("mtcars has expected columns", {
+  withr::local_options(warnPartialMatchDollar = TRUE)
+  # use withr::local_options() to set `warnPartialMatchDollar = TRUE`
+  expect_type(mtcars$cy, "double")
+})
+
+
+
+mtcars$cy
+
+## Extra
+
+tempfile <- function(message) {
+  file <- withr::local_tempfile(fileext = ".txt")
+
+  saveRDS(message, file)
+  print(fs::file_exists(file))
+
+  file
+}
+
+file <- tempfile("Hello")
+fs::file_exists(file)
+
+
+
